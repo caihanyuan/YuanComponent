@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleProgressView">
+        <attr name="set_color" format="color" />
+        <attr name="default_color" format="color" />
+        <attr name="ring_width" format="dimension" />
+        <attr name="show_anim" format="boolean" />
+        <attr name="anim_duration" format="integer" />
+    </declare-styleable>
+</resources>
