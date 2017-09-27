@@ -3,6 +3,7 @@ package com.keepmoving.to.yuancomponent.widget;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.TimeInterpolator;
+import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -20,6 +21,9 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.keepmoving.to.yuancomponent.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 环形进度条, 带动画
  * Created by caihanyuan on 2017/9/25.
@@ -33,18 +37,19 @@ public class CircleProgressView extends View {
     private boolean mShowAnim = false;
     private int mDuration = 1000;
 
-    private int mTmpProgress = 0;
-    protected int mProgress;
-    protected int mMaxProgress = -1;
+    private double mTmpProgress = 0;
+    protected double mProgress;
+    protected double mMaxProgress = -1;
 
-    private int mCenter;
     private RectF mCircleArea;
     private Paint mPaint;
 
     private ValueAnimator mAnimator;
+    private TimeInterpolator mInterpolator;
+    private TypeEvaluator mEvaluator;
     private AnimatorLifeListener mAnimatorLifeListener;
     private AnimatorUpdateListener mAnimatorUpdateListener;
-    private TimeInterpolator mInterpolator;
+    private List<ValueAnimator.AnimatorUpdateListener> mOuterUpdateListeners;
 
     public CircleProgressView(Context context) {
         this(context, null);
@@ -76,6 +81,7 @@ public class CircleProgressView extends View {
     @Override
     protected void onDetachedFromWindow() {
         stopAnim();
+        mOuterUpdateListeners.clear();
     }
 
     private void initView(Context context, AttributeSet attrs) {
@@ -93,6 +99,8 @@ public class CircleProgressView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setColor(mProgressColor);
 
+        mEvaluator = new DoubleEvaluator();
+        mOuterUpdateListeners = new ArrayList<>();
         mAnimatorLifeListener = new AnimatorLifeListener();
         mAnimatorUpdateListener = new AnimatorUpdateListener();
         mInterpolator = new AccelerateDecelerateInterpolator();
@@ -178,9 +186,7 @@ public class CircleProgressView extends View {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int halfWidht = getWidth() / 2;
         int halfRingWidth = mRingWidth / 2;
-        mCenter = halfWidht;
         mCircleArea = new RectF(halfRingWidth, halfRingWidth,
                 getWidth() - halfRingWidth, getHeight() - halfRingWidth);
     }
@@ -188,7 +194,7 @@ public class CircleProgressView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         int startAngle = 90;
-        int progressAngle = (mTmpProgress * 360) / mMaxProgress;
+        int progressAngle = (int) ((mTmpProgress * 360) / mMaxProgress);
         mPaint.setColor(mProgressColor);
         canvas.drawArc(mCircleArea, startAngle, progressAngle, false, mPaint);
 
@@ -203,21 +209,34 @@ public class CircleProgressView extends View {
         return (int) (dpValue * scale + 0.5f);
     }
 
+    /**
+     * 是否显示动画
+     *
+     * @return
+     */
+    public boolean isShowAnim() {
+        return mShowAnim;
+    }
 
     /**
      * 设置当前可用数值
      *
      * @param progress
      */
-    public void setCurrentProgress(int progress) {
+    public void setCurrentProgress(double progress) {
         mProgress = progress;
-        if (!mShowAnim) {
+        if (mShowAnim) {
+            setDurationByProgress();
+        } else {
             mTmpProgress = progress;
-        } else if (isShown()) {
-            startAnim();
         }
-        setDurationByProgress();
-
+        if (isShown()) {
+            if (mShowAnim) {
+                startAnim();
+            } else {
+                invalidate();
+            }
+        }
         // TODO: 2017/9/26 以后还有加上反向动画
     }
 
@@ -227,13 +246,18 @@ public class CircleProgressView extends View {
      *
      * @param maxProgress
      */
-    public void setMaxProgress(int maxProgress) {
+    public void setMaxProgress(double maxProgress) {
         mMaxProgress = maxProgress;
-        if (mShowAnim && isShown()) {
-            startAnim();
+        if (mShowAnim) {
+            setDurationByProgress();
         }
-        setDurationByProgress();
-
+        if (isShown()) {
+            if (mShowAnim) {
+                startAnim();
+            } else {
+                invalidate();
+            }
+        }
         // TODO: 2017/9/26 以后还有加上反向动画
     }
 
@@ -246,7 +270,9 @@ public class CircleProgressView extends View {
             mAnimator.removeAllListeners();
             mAnimator.removeAllUpdateListeners();
         }
-        mAnimator = ValueAnimator.ofInt(0, mProgress);
+        mAnimator = new ValueAnimator();
+        mAnimator.setObjectValues(0.0d, mProgress);
+        mAnimator.setEvaluator(mEvaluator);
         mAnimator.addUpdateListener(mAnimatorUpdateListener);
         mAnimator.addListener(mAnimatorLifeListener);
         mAnimator.setInterpolator(mInterpolator);
@@ -286,11 +312,48 @@ public class CircleProgressView extends View {
     }
 
     /**
+     * 设置是否显示动画
+     *
+     * @param anim
+     */
+    public void setShowAnim(boolean anim) {
+        mShowAnim = anim;
+    }
+
+    /**
+     * 增加数值变化的监听器
+     *
+     * @param updateListener
+     */
+    public void addAnimatorUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
+        mOuterUpdateListeners.add(updateListener);
+    }
+
+    /**
+     * 删除数值变化监听器
+     *
+     * @param updateListener
+     */
+    public void removeAnimatorUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
+        mOuterUpdateListeners.remove(updateListener);
+    }
+
+    /**
      * 根据进度比设置动画时长
      */
     protected void setDurationByProgress() {
         if (mMaxProgress != -1) {
-            mDuration = mProgress * mDuration / mMaxProgress;
+            mDuration = (int) (mProgress * mDuration / mMaxProgress);
+        }
+    }
+
+    /**
+     * 进度数值估值器
+     */
+    class DoubleEvaluator implements TypeEvaluator<Double> {
+        @Override
+        public Double evaluate(float fraction, Double startValue, Double endValue) {
+            return startValue + (endValue - startValue) * fraction;
         }
     }
 
@@ -315,8 +378,12 @@ public class CircleProgressView extends View {
     class AnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener {
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            mTmpProgress = (int) animation.getAnimatedValue();
+            mTmpProgress = (double) animation.getAnimatedValue();
             invalidate();
+
+            for (ValueAnimator.AnimatorUpdateListener updateListener : mOuterUpdateListeners) {
+                updateListener.onAnimationUpdate(animation);
+            }
         }
     }
 

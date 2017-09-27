@@ -1,0 +1,7 @@
+<resources>
+    <!-- CircleProgressContainer -->
+    <dimen name="textsize_24sp">24sp</dimen>
+    <dimen name="textsize_18sp">18sp</dimen>
+    <dimen name="textsize_16sp">16sp</dimen>
+    <dimen name="textsize_14sp">14sp</dimen>
+</resources>
