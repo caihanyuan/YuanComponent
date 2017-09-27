@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="CircleProgressView">
+    <declare-styleable name="Yuan_CircleProgressView">
         <attr name="set_color" format="color" />
         <attr name="default_color" format="color" />
         <attr name="ring_width" format="dimension" />
         <attr name="show_anim" format="boolean" />
         <attr name="anim_duration" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="YUAN_LinearScaleView">
+        <attr name="scale_view_max" format="integer" />
+        <attr name="scale_view_min" format="integer" />
+        <attr name="scale_view_accuracy" format="integer" />
+        <attr name="scale_view_height" format="dimension" />
+        <attr name="scale_view_margin" format="dimension" />
+        <attr name="scale_view_defalut_color" format="color" />
+        <attr name="scale_view_pointer_color" format="color" />
+        <attr name="scale_view_text_margin" format="dimension" />
     </declare-styleable>
 </resources>

@@ -33,7 +33,8 @@ public class MainActivity extends Activity {
     class ActivitysAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         Class<? extends Activity>[] sActivities = new Class[]{
-            CircleProgressActivity.class
+                CircleProgressActivity.class,
+                ScaleViewActivityActivity.class
         };
 
         @Override

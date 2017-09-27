@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/current_num_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="20sp" />
+
+    <com.keepmoving.to.yuancomponent.widget.linearscaleview.HorizontalScaleScrollView
+        android:id="@+id/horizontalScale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:scale_view_accuracy="100"
+        app:scale_view_height="9dip"
+        app:scale_view_margin="8dip"
+        app:scale_view_max="20000"
+        app:scale_view_min="1000"
+        app:scale_view_text_margin="14dp" />
+
+</LinearLayout>

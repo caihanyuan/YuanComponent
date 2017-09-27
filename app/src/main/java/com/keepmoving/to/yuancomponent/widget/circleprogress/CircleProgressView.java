@@ -1,4 +1,4 @@
-package com.keepmoving.to.yuancomponent.widget;
+package com.keepmoving.to.yuancomponent.widget.circleprogress;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -90,12 +90,12 @@ public class CircleProgressView extends View {
     }
 
     private void initView(Context context, AttributeSet attrs) {
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CircleProgressView);
-        mProgressColor = typedArray.getColor(R.styleable.CircleProgressView_set_color, mProgressColor);
-        mDefaultColor = typedArray.getColor(R.styleable.CircleProgressView_default_color, mDefaultColor);
-        mRingWidth = typedArray.getDimensionPixelSize(R.styleable.CircleProgressView_ring_width, mRingWidth);
-        mShowAnim = typedArray.getBoolean(R.styleable.CircleProgressView_show_anim, mShowAnim);
-        mDuration = typedArray.getInt(R.styleable.CircleProgressView_anim_duration, mDuration);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Yuan_CircleProgressView);
+        mProgressColor = typedArray.getColor(R.styleable.Yuan_CircleProgressView_set_color, mProgressColor);
+        mDefaultColor = typedArray.getColor(R.styleable.Yuan_CircleProgressView_default_color, mDefaultColor);
+        mRingWidth = typedArray.getDimensionPixelSize(R.styleable.Yuan_CircleProgressView_ring_width, mRingWidth);
+        mShowAnim = typedArray.getBoolean(R.styleable.Yuan_CircleProgressView_show_anim, mShowAnim);
+        mDuration = typedArray.getInt(R.styleable.Yuan_CircleProgressView_anim_duration, mDuration);
         typedArray.recycle();
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
