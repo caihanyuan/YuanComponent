@@ -74,7 +74,12 @@ public class CircleProgressView extends View {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (mShowAnim) {
-            startAnim();
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startAnim();
+                }
+            }, 150);
         }
     }
 

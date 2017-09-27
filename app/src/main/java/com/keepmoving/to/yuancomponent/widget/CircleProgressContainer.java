@@ -55,7 +55,7 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
         mTotalTip = context.getString(R.string.circle_progress_total_tip);
         mProgressView.addAnimatorUpdateListener(this);
 
-        setCurrentProgress(2000);
+        setCurrentProgress(30000);
         setMaxProgress(50000);
     }
 
