@@ -40,20 +40,28 @@ public class VerticalScaleScrollView extends BaseScaleView {
         mRectWidth = mScaleHeight * 8;
         mScaleMaxHeight = mScaleHeight * 2;
 
-
+        mMinScroll = 0;
+        mMaxScroll = mRectHeight;
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mScaleScrollViewRange = getMeasuredHeight();
-        mMidCountScale = (mScaleScrollViewRange / mScaleMargin / 2) * mAccuracy + mMin;
+        mOffset = (float) mScaleScrollViewRange / 2;
+        mMidCountScale = mMin;
         mTempScale = mMidCountScale;
+
+        if (mStartOverRange + mEndOverRange > mScaleScrollViewRange) {
+            mUnderLineSize = mStartOverRange + mEndOverRange + mRectWidth;
+        } else {
+            mUnderLineSize = mScaleScrollViewRange + mRectWidth;
+        }
     }
 
     @Override
     protected void onDrawLine(Canvas canvas, Paint paint) {
-        canvas.drawLine(0, 0, 0, mRectHeight, paint);
+        canvas.drawLine(0, 0, 0, mUnderLineSize, paint);
     }
 
     @Override
@@ -62,12 +70,28 @@ public class VerticalScaleScrollView extends BaseScaleView {
 
         int factor = mAccuracy * 10;
         for (int i = 0, k = mMin; i <= mScaleNums; i++, k += mAccuracy) {
+            float yPosition = mOffset + i * mScaleMargin;
             if (i % factor == 0) { //整值
-                canvas.drawLine(0, i * mScaleMargin, mScaleMaxHeight, i * mScaleMargin, paint);
+                canvas.drawLine(0, yPosition, mScaleMaxHeight, yPosition, paint);
                 //整值文字
-                canvas.drawText(String.valueOf(k), mScaleMaxHeight + 40, i * mScaleMargin + paint.getTextSize() / 3, paint);
+                canvas.drawText(String.valueOf(k), mScaleMaxHeight + 40, yPosition + paint.getTextSize() / 3, paint);
             } else {
-                canvas.drawLine(0, i * mScaleMargin, mScaleHeight, i * mScaleMargin, paint);
+                canvas.drawLine(0, yPosition, mScaleHeight, yPosition, paint);
+            }
+        }
+
+        //画范围外刻度
+        if (mMin - mOuterMin > 0) {
+            int outerNums = (mMin - mOuterMin) / mAccuracy;
+            for (int i = 1, k = mMin - mAccuracy; i <= outerNums; i++, k -= mAccuracy) {
+                float yPosition = mOffset - i * mScaleMargin;
+                if (k % factor == 0) { //整值
+                    canvas.drawLine(0, yPosition, mScaleMaxHeight, yPosition, paint);
+                    //整值文字
+                    canvas.drawText(String.valueOf(k), mScaleMaxHeight + 40, yPosition + paint.getTextSize() / 3, paint);
+                } else {
+                    canvas.drawLine(0, yPosition, mScaleHeight, yPosition, paint);
+                }
             }
         }
     }
@@ -78,22 +102,24 @@ public class VerticalScaleScrollView extends BaseScaleView {
         paint.setColor(Color.RED);
 
         //每一屏幕刻度的个数/2
-        int countScale = mScaleScrollViewRange / mScaleMargin / 2;
+        int offestScale = 0;
         //根据滑动的距离，计算指针的位置【指针始终位于屏幕中间】
-        int finalY = mScroller.getFinalY();
+        int currentY = getScrollY();
         //滑动的刻度
-        int tmpCountScale = (int) Math.rint((double) finalY / (double) mScaleMargin); //四舍五入取整
+        int tmpCountScale = (int) Math.rint((double) currentY / (double) mScaleMargin); //四舍五入取整
         //总刻度
-        mCountScale = (tmpCountScale + countScale) * mAccuracy + mMin;
+        mCountScale = (tmpCountScale + offestScale) * mAccuracy + mMin;
         if (mScrollListener != null) { //回调方法
             mScrollListener.onScaleScroll(mCountScale);
         }
 
-        if (mScroller.isFinished()) {
-            canvas.drawLine(0, countScale * mScaleMargin + finalY,
-                    mScaleMaxHeight + mScaleHeight, countScale * mScaleMargin + finalY, paint);
+
+        if (!mIsDown && mScroller.isFinished()) {
+            int finalY = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
+            float center = mOffset + finalY;
+            canvas.drawLine(0, center, mScaleMaxHeight + mScaleHeight, center, paint);
         } else {
-            float center = mScaleScrollViewRange / 2 + finalY;
+            float center = mOffset + currentY;
             canvas.drawLine(0, center, mScaleMaxHeight + mScaleHeight, center, paint);
         }
     }
@@ -108,37 +134,71 @@ public class VerticalScaleScrollView extends BaseScaleView {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int y = (int) event.getY();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (mScroller != null && !mScroller.isFinished()) {
-                    mScroller.abortAnimation();
-                }
-                mScrollLastX = y;
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                int dataY = mScrollLastX - y;
-                if (mCountScale - mTempScale < 0) { //向下边滑动
-                    if (mCountScale <= mMin && dataY <= 0) //禁止继续向下滑动
-                        return super.onTouchEvent(event);
-                } else if (mCountScale - mTempScale > 0) { //向上边滑动
-                    if (mCountScale >= mMax && dataY >= 0) //禁止继续向上滑动
-                        return super.onTouchEvent(event);
-                }
-                smoothScrollBy(0, dataY, 0);
-                mScrollLastX = y;
-                postInvalidate();
-                mTempScale = mCountScale;
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (mCountScale < mMin) mCountScale = mMin;
-                if (mCountScale > mMax) mCountScale = mMax;
-                int finalY = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
-                mScroller.setFinalY(finalY); //纠正指针位置
-                postInvalidate();
-                return true;
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        int oldX = getScrollX();
+        int oldY = getScrollY();
+        scrollTo(scrollX, scrollY);
+        onScrollChanged(scrollX, scrollY, oldX, oldY);
+    }
+
+    @Override
+    protected boolean onDown(MotionEvent e) {
+        if (mScroller != null && !mScroller.isFinished()) {
+            mScroller.forceFinished(true);
+            postInvalidate();
         }
-        return super.onTouchEvent(event);
+        return true;
+    }
+
+    @Override
+    protected boolean onUp(MotionEvent e) {
+        if (mIsOver) {
+            int scrollY = getScrollY();
+            boolean isStart = scrollY < mMinScroll;
+            mScrollListener.onOverScrolled(isStart);
+            mScroller.springBack(0, scrollY, 0, 0, mMinScroll, mMaxScroll);
+        }
+        postInvalidate();
+        return true;
+    }
+
+    @Override
+    protected boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        int dataY = (int) distanceY;
+        getCanScrollDistance(dataY);
+        smoothScrollBy(0, dataY);
+        postInvalidate();
+        mTempScale = mCountScale;
+        return false;
+    }
+
+    @Override
+    protected boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if (velocityY > MAX_VELOCITY) {
+            velocityY = MAX_VELOCITY;
+        }
+        float distanceY = Math.abs(e1.getY() - e2.getY());
+        if (distanceY >= MIN_DISTANCE && Math.abs(velocityY) >= MIN_VELOCITY) {
+            mScroller.fling(0, getScrollY(), 0, -(int) velocityY, 0, 0, 0, mRectHeight);
+            postInvalidate();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    protected int getCanScrollDistance(int distance) {
+        int finalPostion = getScrollY() + distance;
+        if (finalPostion < mMinScroll) {
+            distance = mMinScroll - getScrollY();
+            mIsOver = true;
+        } else if (finalPostion > mMaxScroll) {
+            distance = mMaxScroll - getScrollY();
+            mIsOver = true;
+        } else {
+            mIsOver = false;
+        }
+        return distance;
     }
 }

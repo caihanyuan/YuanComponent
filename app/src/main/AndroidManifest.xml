@@ -19,7 +19,7 @@
 
         <activity android:name=".activity.CircleProgressActivity" />
 
-        <activity android:name=".activity.ScaleViewActivityActivity" />
+        <activity android:name=".activity.ScaleViewActivity" />
     </application>
 
 </manifest>

@@ -41,6 +41,9 @@ public class HorizontalScaleScrollView extends BaseScaleView {
         mRectHeight = mScaleHeight * 8;
         mScaleMaxHeight = mScaleHeight * 2;
 
+        mMinScroll = 0;
+        mMaxScroll = mRectWidth;
+
         mTextTop = mRectHeight - mScaleMaxHeight - mTextMargin;
         mNormalScaleTop = mRectHeight - mScaleHeight;
         mMaxScaleTop = mRectHeight - mScaleMaxHeight;
@@ -52,13 +55,20 @@ public class HorizontalScaleScrollView extends BaseScaleView {
         int height = MeasureSpec.makeMeasureSpec(mRectHeight, MeasureSpec.AT_MOST);
         super.onMeasure(widthMeasureSpec, height);
         mScaleScrollViewRange = getMeasuredWidth();
-        mMidCountScale = (mScaleScrollViewRange / mScaleMargin / 2) * mAccuracy + mMin;
+        mOffset = ((float) mScaleScrollViewRange) / 2;
+        mMidCountScale = mMin;
         mTempScale = mMidCountScale;
+
+        if (mStartOverRange + mEndOverRange > mScaleScrollViewRange) {
+            mUnderLineSize = mStartOverRange + mEndOverRange + mRectWidth;
+        } else {
+            mUnderLineSize = mScaleScrollViewRange + mRectWidth;
+        }
     }
 
     @Override
     protected void onDrawLine(Canvas canvas, Paint paint) {
-        canvas.drawLine(0, mRectHeight, mRectWidth, mRectHeight, paint);
+        canvas.drawLine(0, mRectHeight, mUnderLineSize, mRectHeight, paint);
     }
 
     @Override
@@ -67,36 +77,65 @@ public class HorizontalScaleScrollView extends BaseScaleView {
 
         int factor = mAccuracy * 10;
         for (int i = 0, k = mMin; i <= mScaleNums; i++, k += mAccuracy) {
+            float xPosition = mOffset + i * mScaleMargin;
             if (k % factor == 0) { //整值
-                canvas.drawLine(i * mScaleMargin, mRectHeight, i * mScaleMargin, mMaxScaleTop, paint);
+                canvas.drawLine(xPosition, mRectHeight, xPosition, mMaxScaleTop, paint);
                 //整值文字
-                canvas.drawText(String.valueOf(k), i * mScaleMargin, mTextTop, paint);
+                canvas.drawText(String.valueOf(k), xPosition, mTextTop, paint);
             } else {
-                canvas.drawLine(i * mScaleMargin, mRectHeight, i * mScaleMargin, mNormalScaleTop, paint);
+                canvas.drawLine(xPosition, mRectHeight, xPosition, mNormalScaleTop, paint);
             }
         }
 
+        //画范围外刻度
+        if (mMin - mOuterMin > 0) {
+            int outerNums = (mMin - mOuterMin) / mAccuracy;
+            for (int i = 1, k = mMin - mAccuracy; i <= outerNums; i++, k -= mAccuracy) {
+                float xPosition = mOffset - i * mScaleMargin;
+                if (k % factor == 0) { //整值
+                    canvas.drawLine(xPosition, mRectHeight, xPosition, mMaxScaleTop, paint);
+                    //整值文字
+                    canvas.drawText(String.valueOf(k), xPosition, mTextTop, paint);
+                } else {
+                    canvas.drawLine(xPosition, mRectHeight, xPosition, mNormalScaleTop, paint);
+                }
+            }
+        }
+        if (mOuterMax - mMax > 0) {
+            int outerNums = (mOuterMax - mMax) / mAccuracy;
+            float startPosition = mOffset + mRectWidth;
+            for (int i = 1, k = mMax + mAccuracy; i <= outerNums; i++, k += mAccuracy) {
+                float xPosition = startPosition + i * mScaleMargin;
+                if (k % factor == 0) { //整值
+                    canvas.drawLine(xPosition, mRectHeight, xPosition, mMaxScaleTop, paint);
+                    //整值文字
+                    canvas.drawText(String.valueOf(k), xPosition, mTextTop, paint);
+                } else {
+                    canvas.drawLine(xPosition, mRectHeight, xPosition, mNormalScaleTop, paint);
+                }
+            }
+        }
     }
 
     @Override
     protected void onDrawPointer(Canvas canvas, Paint paint) {
-        //每一屏幕刻度的个数/2
-        int countScale = mScaleScrollViewRange / mScaleMargin / 2;
+        int offestScale = 0;
         //根据滑动的距离，计算指针的位置【指针始终位于屏幕中间】
-        int finalX = mScroller.getFinalX();
+        int currentX = getScrollX();
         //滑动的刻度
-        int tmpCountScale = (int) Math.rint((double) finalX / (double) mScaleMargin); //四舍五入取整
+        int tmpCountScale = (int) Math.rint((double) currentX / (double) mScaleMargin); //四舍五入取整
         //总刻度
-        mCountScale = (tmpCountScale + countScale) * mAccuracy + mMin;
+        mCountScale = (tmpCountScale + offestScale) * mAccuracy + mMin;
         if (mScrollListener != null) { //回调方法
             mScrollListener.onScaleScroll(mCountScale);
         }
 
-        if (mScroller.isFinished()) {
-            canvas.drawLine(countScale * mScaleMargin + finalX, mRectHeight,
-                    countScale * mScaleMargin + finalX, mPointerTop, paint);
+        if (!mIsDown && mScroller.isFinished()) {
+            int finalX = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
+            float center = mOffset + finalX;
+            canvas.drawLine(center, mRectHeight, center, mPointerTop, paint);
         } else {
-            float center = mScaleScrollViewRange / 2 + finalX;
+            float center = mOffset + currentX;
             canvas.drawLine(center, mRectHeight, center, mPointerTop, paint);
         }
     }
@@ -111,38 +150,72 @@ public class HorizontalScaleScrollView extends BaseScaleView {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                if (mScroller != null && !mScroller.isFinished()) {
-                    mScroller.abortAnimation();
-                }
-                mScrollLastX = x;
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                int dataX = mScrollLastX - x;
-                if (mCountScale - mTempScale < 0) { //向右边滑动
-                    if (mCountScale <= mMin && dataX <= 0) //禁止继续向右滑动
-                        return super.onTouchEvent(event);
-                } else if (mCountScale - mTempScale > 0) { //向左边滑动
-                    if (mCountScale >= mMax && dataX >= 0) //禁止继续向左滑动
-                        return super.onTouchEvent(event);
-                }
-                smoothScrollBy(dataX, 0, 0);
-                mScrollLastX = x;
-                postInvalidate();
-                mTempScale = mCountScale;
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (mCountScale < mMin) mCountScale = mMin;
-                if (mCountScale > mMax) mCountScale = mMax;
-                int finalX = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
-                mScroller.setFinalX(finalX); //纠正指针位置
-                postInvalidate();
-                return true;
-        }
-        return super.onTouchEvent(event);
+    protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+        int oldX = getScrollX();
+        int oldY = getScrollY();
+        scrollTo(scrollX, scrollY);
+        onScrollChanged(scrollX, scrollY, oldX, oldY);
     }
 
+    @Override
+    protected boolean onDown(MotionEvent e) {
+        if (mScroller != null && !mScroller.isFinished()) {
+            mScroller.forceFinished(true);
+            postInvalidate();
+        }
+        return true;
+    }
+
+    @Override
+    protected boolean onUp(MotionEvent e) {
+        if (mIsOver) {
+            int scrollX = getScrollX();
+            boolean isStart = scrollX < mMinScroll;
+            mScrollListener.onOverScrolled(isStart);
+            mScroller.springBack(scrollX, 0, mMinScroll, mMaxScroll, 0, 0);
+        }
+        postInvalidate();
+        return true;
+    }
+
+    @Override
+    protected boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        int dataX = (int) distanceX;
+        getCanScrollDistance(dataX);
+        smoothScrollBy(dataX, 0);
+        postInvalidate();
+        mTempScale = mCountScale;
+        return false;
+    }
+
+    @Override
+    protected boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if (velocityX > MAX_VELOCITY) {
+            velocityX = MAX_VELOCITY;
+        }
+        float distanceX = Math.abs(e1.getX() - e2.getX());
+        if (distanceX >= MIN_DISTANCE && Math.abs(velocityX) >= MIN_VELOCITY) {
+            mScroller.fling(getScrollX(), 0, -(int) velocityX, 0, 0, mRectWidth, 0, 0);
+            postInvalidate();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    protected int getCanScrollDistance(int distance) {
+        int finalPostion = getScrollX() + distance;
+        if (finalPostion < mMinScroll) {
+            distance = mMinScroll - getScrollX();
+            mIsOver = true;
+        } else if (finalPostion > mMaxScroll) {
+            distance = mMaxScroll - getScrollX();
+            mIsOver = true;
+        } else {
+            mIsOver = false;
+        }
+
+        return distance;
+    }
 }
