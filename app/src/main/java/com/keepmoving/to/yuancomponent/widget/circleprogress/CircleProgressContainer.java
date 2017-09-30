@@ -20,8 +20,6 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
 
     private static final String TAG = CircleProgressContainer.class.getSimpleName();
 
-    private String mTotalTip;
-
     private CircleProgressView mProgressView;
     private TextView mCurrentProgressText;
     private TextView mMaxProgressText;
@@ -52,11 +50,7 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
         mCurrentProgressText = (TextView) findViewById(R.id.current_progress_text);
         mMaxProgressText = (TextView) findViewById(R.id.total_progress_text);
 
-        mTotalTip = context.getString(R.string.circle_progress_total_tip);
         mProgressView.addAnimatorUpdateListener(this);
-
-        setCurrentProgress(30000);
-        setMaxProgress(50000);
     }
 
     @Override
@@ -71,12 +65,12 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
      * @param progress
      */
     public void setCurrentProgress(double progress) {
-        mProgressView.setCurrentProgress(progress);
         if (!mProgressView.isShowAnim()) {
             setCurrentProgressText(progress);
         } else {
             setCurrentProgressText(0);
         }
+        mProgressView.setCurrentProgress(progress);
     }
 
     /**
@@ -101,7 +95,7 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
      * 设置最大数值提示文本
      */
     protected void setMaxProgressText(double maxProgress) {
-        String tip = String.format(mTotalTip, StringUtils.splitMoney(maxProgress));
+        String tip = StringUtils.splitMoney(maxProgress);
         mMaxProgressText.setText(tip);
     }
 }

@@ -3,6 +3,6 @@
 
     <!-- CircleProgressContainer -->
     <string name="circle_progress_upgrade_money">提额</string>
-    <string name="circle_progress_title_tip">可用额度 (元)</string>
-    <string name="circle_progress_total_tip">总额度%1$s元</string>
+    <string name="circle_progress_title_tip">可用额度(元)</string>
+    <string name="circle_progress_total_title">总额度(元)</string>
 </resources>

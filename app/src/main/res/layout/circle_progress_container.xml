@@ -1,56 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <com.keepmoving.to.yuancomponent.widget.circleprogress.CircleProgressView
         android:id="@+id/progress_view"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_gravity="center"
+        android:layout_width="225dp"
+        android:layout_height="225dp"
+        android:layout_centerInParent="true"
         app:anim_duration="1500"
-        app:ring_width="8dp"
-        app:show_anim="true" />
+        app:default_color="@color/default_color"
+        app:default_ring_width="4dp"
+        app:end_angle="410"
+        app:progress_ring_width="12dp"
+        app:show_anim="true"
+        app:start_angle="130" />
+
+    <TextView
+        android:id="@+id/current_progress_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="0.00"
+        android:textColor="#FFF44B10"
+        android:textSize="@dimen/textsize_40sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/current_progress_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="2dp"
+        android:text="@string/circle_progress_title_tip"
+        android:textSize="@dimen/textsize_13sp" />
 
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_alignBottom="@id/progress_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/circle_progress_title_tip"
-            android:textSize="@dimen/textsize_16sp" />
-
-        <TextView
-            android:id="@+id/current_progress_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="0.00"
-            android:textColor="@android:color/holo_red_dark"
-            android:textSize="@dimen/textsize_24sp" />
+            android:text="@string/circle_progress_total_title"
+            android:textSize="@dimen/textsize_13sp" />
 
         <TextView
             android:id="@+id/total_progress_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/circle_progress_total_tip"
-            android:textSize="@dimen/textsize_14sp" />
-    </LinearLayout>
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="2dp"
+            android:text="0.00"
+            android:textColor="#FF434343"
+            android:textSize="@dimen/textsize_18sp" />
 
-    <TextView
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:text="@string/circle_progress_upgrade_money"
-        android:textSize="@dimen/textsize_16sp"
-        android:visibility="gone" />
-</merge>
+    </LinearLayout>
+</RelativeLayout>
