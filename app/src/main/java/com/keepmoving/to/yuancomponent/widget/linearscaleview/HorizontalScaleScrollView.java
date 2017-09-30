@@ -126,6 +126,13 @@ public class HorizontalScaleScrollView extends BaseScaleView {
         int tmpCountScale = (int) Math.rint((double) currentX / (double) mScaleMargin); //四舍五入取整
         //总刻度
         mCountScale = (tmpCountScale + offestScale) * mAccuracy + mMin;
+
+        if (mCountScale < mOuterMin) {
+            mCountScale = mOuterMin;
+        } else if (mCountScale > mOuterMax) {
+            mCountScale = mOuterMax;
+        }
+
         if (mScrollListener != null) { //回调方法
             mScrollListener.onScaleScroll(mCountScale);
         }
@@ -197,10 +204,8 @@ public class HorizontalScaleScrollView extends BaseScaleView {
         if (distanceX >= MIN_DISTANCE && Math.abs(velocityX) >= MIN_VELOCITY) {
             mScroller.fling(getScrollX(), 0, -(int) velocityX, 0, 0, mRectWidth, 0, 0);
             postInvalidate();
-            return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     @Override

@@ -24,11 +24,11 @@
         android:overScrollMode="always"
         app:scale_view_accuracy="100"
         app:scale_view_defalut_color="#FFC5C5C5"
+        app:scale_view_end_over_range="300dp"
         app:scale_view_height="9dip"
         app:scale_view_margin="8dip"
         app:scale_view_max="15000"
         app:scale_view_min="1000"
-        app:scale_view_outer_max="17000"
         app:scale_view_outer_min="0"
         app:scale_view_pointer_color="#FFF44B10"
         app:scale_view_text_margin="14dp" />

@@ -113,6 +113,11 @@ public class VerticalScaleScrollView extends BaseScaleView {
             mScrollListener.onScaleScroll(mCountScale);
         }
 
+        if (mCountScale < mOuterMin) {
+            mCountScale = mOuterMin;
+        } else if (mCountScale > mOuterMax) {
+            mCountScale = mOuterMax;
+        }
 
         if (!mIsDown && mScroller.isFinished()) {
             int finalY = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
@@ -181,10 +186,9 @@ public class VerticalScaleScrollView extends BaseScaleView {
         if (distanceY >= MIN_DISTANCE && Math.abs(velocityY) >= MIN_VELOCITY) {
             mScroller.fling(0, getScrollY(), 0, -(int) velocityY, 0, 0, 0, mRectHeight);
             postInvalidate();
-            return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     @Override

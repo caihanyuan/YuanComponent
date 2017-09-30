@@ -201,9 +201,6 @@ public abstract class BaseScaleView extends View {
         if (!mGestureDetector.onTouchEvent(event)) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 mIsDown = false;
-                if (mIsOver) {
-//                    onOverScroll(mScroller.getCurrX(), mScroller.getCurrY());
-                }
                 return onUp(event);
             }
             return super.onTouchEvent(event);
