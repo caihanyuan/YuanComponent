@@ -19,11 +19,14 @@
         <attr name="scale_view_outer_max" format="integer" />
         <attr name="scale_view_accuracy" format="integer" />
         <attr name="scale_view_height" format="dimension" />
+        <attr name="scale_view_max_height" format="dimension" />
+        <attr name="scale_view_text_size" format="integer" />
         <attr name="scale_view_margin" format="dimension" />
         <attr name="scale_view_defalut_color" format="color" />
         <attr name="scale_view_pointer_color" format="color" />
         <attr name="scale_view_text_margin" format="dimension" />
         <attr name="scale_view_start_over_range" format="dimension" />
         <attr name="scale_view_end_over_range" format="dimension" />
+        <attr name="scale_view_extend" format="boolean" />
     </declare-styleable>
 </resources>

@@ -22,6 +22,13 @@ public class ScaleViewActivity extends Activity implements BaseScaleView.OnScrol
         horizontalScale = (HorizontalScaleScrollView) findViewById(R.id.horizontalScale);
         horizontalScale.setOnScrollListener(this);
         mCurrentText = (TextView) findViewById(R.id.current_num_text);
+
+        horizontalScale.setMin(1000);
+        horizontalScale.setMax(50000);
+        horizontalScale.setOuterMax(50000);
+        horizontalScale.setOuterMin(0);
+        horizontalScale.scrollToScale(50000);
+        horizontalScale.postInvalidate();
     }
 
     @Override

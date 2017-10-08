@@ -38,7 +38,6 @@ public class VerticalScaleScrollView extends BaseScaleView {
         super.initVar();
         mRectHeight = mScaleNums * mScaleMargin;
         mRectWidth = mScaleHeight * 8;
-        mScaleMaxHeight = mScaleHeight * 2;
 
         mMinScroll = 0;
         mMaxScroll = mRectHeight;
@@ -56,6 +55,20 @@ public class VerticalScaleScrollView extends BaseScaleView {
             mUnderLineSize = mStartOverRange + mEndOverRange + mRectWidth;
         } else {
             mUnderLineSize = mScaleScrollViewRange + mRectWidth;
+        }
+    }
+
+    @Override
+    protected void extendScaleMarginIfNeed() {
+        if (mExtend) {
+            int scaleNums = ((mOuterMax - mOuterMin) / mAccuracy);
+            int rectHeight = scaleNums * mScaleMargin;
+            int minRectHeight = mScaleScrollViewRange * 2 / 3;
+            if (rectHeight < minRectHeight) {
+                mScaleMargin = minRectHeight / scaleNums;
+                mRectHeight = mScaleNums * mScaleMargin;
+                mMaxScroll = mRectHeight;
+            }
         }
     }
 
@@ -119,13 +132,14 @@ public class VerticalScaleScrollView extends BaseScaleView {
             mCountScale = mOuterMax;
         }
 
+        float center = mOffset + currentY;
+        canvas.drawLine(0, center, mScaleMaxHeight + mScaleHeight, center, paint);
+
         if (!mIsDown && mScroller.isFinished()) {
-            int finalY = ((mCountScale - mMidCountScale) / mAccuracy) * mScaleMargin;
-            float center = mOffset + finalY;
-            canvas.drawLine(0, center, mScaleMaxHeight + mScaleHeight, center, paint);
-        } else {
-            float center = mOffset + currentY;
-            canvas.drawLine(0, center, mScaleMaxHeight + mScaleHeight, center, paint);
+            int dataY = tmpCountScale * mScaleMargin - currentY;
+            if (dataY != 0) {
+                smoothScrollBy(0, dataY, 200);
+            }
         }
     }
 
@@ -157,11 +171,17 @@ public class VerticalScaleScrollView extends BaseScaleView {
 
     @Override
     protected boolean onUp(MotionEvent e) {
+        int scrollY = getScrollY();
         if (mIsOver) {
-            int scrollY = getScrollY();
             boolean isStart = scrollY < mMinScroll;
-            mScrollListener.onOverScrolled(isStart);
             mScroller.springBack(0, scrollY, 0, 0, mMinScroll, mMaxScroll);
+            if (mScrollListener != null) {
+                mScrollListener.onOverScrolled(isStart);
+            }
+        } else if (mScroller.isFinished()) {
+            int tmpCountScale = (int) Math.rint((double) scrollY / (double) mScaleMargin);
+            int dataY = tmpCountScale * mScaleMargin - scrollY;
+            smoothScrollBy(0, dataY, 250);
         }
         postInvalidate();
         return true;

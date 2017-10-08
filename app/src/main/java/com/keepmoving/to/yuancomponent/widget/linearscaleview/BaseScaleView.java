@@ -49,6 +49,8 @@ public abstract class BaseScaleView extends View {
     protected int mScaleHeight; //刻度线的高度
     protected int mScaleMaxHeight; //整刻度线高度
     protected int mUnderLineSize; //刻度底线长度
+    protected int mScaleTextSize; //刻度文字大小
+    protected boolean mExtend; //如果不满一屏，是否需要扩展刻度
 
     protected int mRectWidth; //总宽度
     protected int mRectHeight; //总高度
@@ -99,21 +101,24 @@ public abstract class BaseScaleView extends View {
         mMax = ta.getInteger(R.styleable.YUAN_LinearScaleView_scale_view_max, 200);
         mOuterMin = ta.getInteger(R.styleable.YUAN_LinearScaleView_scale_view_outer_min, mMin);
         mOuterMax = ta.getInteger(R.styleable.YUAN_LinearScaleView_scale_view_outer_max, mMax);
-        mMax = ta.getInteger(R.styleable.YUAN_LinearScaleView_scale_view_max, 200);
         mAccuracy = ta.getInteger(R.styleable.YUAN_LinearScaleView_scale_view_accuracy, 1);
         mScaleMargin = ta.getDimensionPixelOffset(R.styleable.YUAN_LinearScaleView_scale_view_margin, 15);
         mScaleHeight = ta.getDimensionPixelOffset(R.styleable.YUAN_LinearScaleView_scale_view_height, 20);
+        mScaleMaxHeight = ta.getDimensionPixelOffset(R.styleable.YUAN_LinearScaleView_scale_view_max_height, mScaleHeight * 2);
         mDefalutColor = ta.getColor(R.styleable.YUAN_LinearScaleView_scale_view_defalut_color, Color.GRAY);
         mPointerColor = ta.getColor(R.styleable.YUAN_LinearScaleView_scale_view_pointer_color, Color.RED);
+        mExtend = ta.getBoolean(R.styleable.YUAN_LinearScaleView_scale_view_extend, false);
         mTextMargin = ta.getDimensionPixelSize(R.styleable.YUAN_LinearScaleView_scale_view_text_margin,
                 dip2px(getContext(), 8));
+        int textSP = ta.getInt(R.styleable.YUAN_LinearScaleView_scale_view_text_size, 10);
+        mScaleTextSize = sp2px(getContext(), textSP);
 
         int defaultStartRange = (mMin - mOuterMin) / mAccuracy * mScaleMargin;
         mStartOverRange = ta.getDimensionPixelSize(R.styleable.YUAN_LinearScaleView_scale_view_start_over_range,
                 defaultStartRange);
 
         int defaultEndRange = (mOuterMax - mMax) / mAccuracy * mScaleMargin;
-        defaultStartRange = defaultEndRange == 0 ? defaultStartRange : defaultEndRange;
+        defaultEndRange = defaultEndRange == 0 ? defaultStartRange : defaultEndRange;
         mEndOverRange = ta.getDimensionPixelOffset(R.styleable.YUAN_LinearScaleView_scale_view_end_over_range,
                 defaultEndRange);
 
@@ -130,6 +135,8 @@ public abstract class BaseScaleView extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         // 文字居中
         mPaint.setTextAlign(Paint.Align.CENTER);
+        //字体大小
+        mPaint.setTextSize(mScaleTextSize);
 
         //手势相关初始化
         GestureListener guestureListener = new GestureListener();
@@ -141,6 +148,11 @@ public abstract class BaseScaleView extends View {
     public static int dip2px(Context context, float dpValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    public static int sp2px(Context context, float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
     }
 
 
@@ -155,7 +167,66 @@ public abstract class BaseScaleView extends View {
     }
 
     protected void initVar() {
-        mScaleNums = ((mMax - mMin) / mAccuracy);
+        if (mMax >= mMin) {
+            mScaleNums = ((mMax - mMin) / mAccuracy);
+        }
+        mCountScale = mMin;
+    }
+
+    /**
+     * 如果没有满屏，则扩大刻度间距
+     */
+    abstract void extendScaleMarginIfNeed();
+
+    /**
+     * 设置最小刻度
+     *
+     * @param min
+     */
+    public void setMin(int min) {
+        mMin = min;
+        mCountScale = mMin;
+        if (mMax >= mMin) {
+            mScaleNums = ((mMax - mMin) / mAccuracy);
+            mRectWidth = mScaleNums * mScaleMargin;
+        }
+    }
+
+    /**
+     * 设置最大刻度
+     *
+     * @param max
+     */
+    public void setMax(int max) {
+        mMax = max;
+        if (mMax >= mMin) {
+            mScaleNums = ((mMax - mMin) / mAccuracy);
+            mRectWidth = mScaleNums * mScaleMargin;
+            mMaxScroll = mRectWidth;
+        }
+    }
+
+    /**
+     * 设置可滑动超出边界的最小值
+     *
+     * @param outerMin
+     */
+    public void setOuterMin(int outerMin) {
+        mOuterMin = outerMin;
+
+        int defaultStartRange = (mMin - mOuterMin) / mAccuracy * mScaleMargin;
+        if (defaultStartRange > mStartOverRange) {
+            mStartOverRange = defaultStartRange;
+        }
+    }
+
+    /**
+     * 设置可滑动超出边界的最大值
+     *
+     * @param outerMax
+     */
+    public void setOuterMax(int outerMax) {
+        mOuterMax = outerMax;
     }
 
     /**
@@ -380,11 +451,10 @@ public abstract class BaseScaleView extends View {
         return false;
     }
 
-    /**
+    /*d
      * 滑动超出边界
      */
     protected void onOverScroll(float currentX, float currentY) {
-
     }
 
     /**

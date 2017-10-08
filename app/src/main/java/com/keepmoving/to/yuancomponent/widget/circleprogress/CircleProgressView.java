@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -52,6 +53,7 @@ public class CircleProgressView extends View {
 
     private RectF mCircleArea;
     private Paint mPaint;
+    private Matrix mMatrix;
 
     private Shader mShader; //颜色渐变
     private ValueAnimator mAnimator;
@@ -95,6 +97,7 @@ public class CircleProgressView extends View {
 
     @Override
     protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         stopAnim();
         mOuterUpdateListeners.clear();
     }
@@ -122,6 +125,7 @@ public class CircleProgressView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setColor(mProgressColor);
         mPaint.setStrokeCap(mCap);
+        mMatrix = new Matrix();
 
         mAngleDistance = mEndAngle - mStartAngle;
         mEvaluator = new DoubleEvaluator();
@@ -254,10 +258,14 @@ public class CircleProgressView extends View {
             paint.setShader(mShader);
             return true;
         } else {
-            int center = (int) (mCircleArea.right - mCircleArea.left) / 2;
             int startColor = getResources().getColor(R.color.start_color);
             int endColor = getResources().getColor(R.color.end_color);
+            int center = (int) (mCircleArea.right - mCircleArea.left) / 2;
+
+            mMatrix.setRotate(mStartAngle - 10, center, center);
             SweepGradient sweepGradient = new SweepGradient(center, center, startColor, endColor);
+            sweepGradient.setLocalMatrix(mMatrix);
+
             paint.setShader(sweepGradient);
 
             mShader = sweepGradient;
