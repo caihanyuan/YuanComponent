@@ -32,10 +32,16 @@ public class MainActivity extends Activity {
 
     class ActivitysAdapter extends RecyclerView.Adapter<ItemHolder> {
 
-        Class<? extends Activity>[] sActivities = new Class[]{
+        Class<? extends Activity>[] mActivities = new Class[]{
                 CircleProgressActivity.class,
                 ScaleViewActivity.class,
                 PolygonActivity.class
+        };
+
+        String[] mDemoTips = new String[]{
+                "圆形进度条",
+                "刻度尺",
+                "圆角多边形"
         };
 
         @Override
@@ -46,12 +52,12 @@ public class MainActivity extends Activity {
 
         @Override
         public void onBindViewHolder(ItemHolder holder, int position) {
-            holder.bind(sActivities[position]);
+            holder.bind(mActivities[position], mDemoTips[position]);
         }
 
         @Override
         public int getItemCount() {
-            return sActivities.length;
+            return mActivities.length;
         }
     }
 
@@ -61,8 +67,8 @@ public class MainActivity extends Activity {
             super(itemView);
         }
 
-        public void bind(final Class<? extends Activity> activityClass) {
-            ((TextView) itemView).setText(activityClass.getSimpleName());
+        public void bind(final Class<? extends Activity> activityClass, final String tip) {
+            ((TextView) itemView).setText(tip);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
