@@ -1,4 +1,4 @@
-package com.keepmoving.to.yuancomponent.widget;
+package com.keepmoving.to.yuancomponent.widget.linearscaleview;
 
 import android.content.Context;
 import android.os.Build;

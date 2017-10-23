@@ -34,7 +34,8 @@ public class MainActivity extends Activity {
 
         Class<? extends Activity>[] sActivities = new Class[]{
                 CircleProgressActivity.class,
-                ScaleViewActivity.class
+                ScaleViewActivity.class,
+                PolygonActivity.class
         };
 
         @Override

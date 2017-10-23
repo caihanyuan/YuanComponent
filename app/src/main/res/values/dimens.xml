@@ -7,4 +7,9 @@
     <dimen name="textsize_16sp">16sp</dimen>
     <dimen name="textsize_14sp">14sp</dimen>
     <dimen name="textsize_13sp">13sp</dimen>
+
+    <!-- polygon view -->
+    <dimen name="polygon_stroke_paint_width">4dp</dimen>
+    <dimen name="polygon_max_corner_radius">128dp</dimen>
+
 </resources>
