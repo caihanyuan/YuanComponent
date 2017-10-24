@@ -1,8 +1,9 @@
-package com.keepmoving.to.yuancomponent.activity;
+package com.keepmoving.to.yuancomponent.activity.bazier;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -10,10 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.keepmoving.to.yuancomponent.R;
-import com.keepmoving.to.yuancomponent.activity.bazier.BazierTestActivity;
 
-public class MainActivity extends Activity {
-
+public class BazierTestActivity extends AppCompatActivity {
 
     private RecyclerView mainContainer;
     private ActivitysAdapter mAdapter;
@@ -21,7 +20,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
+        setContentView(R.layout.activity_bazier_test);
 
         mAdapter = new ActivitysAdapter();
 
@@ -30,21 +29,20 @@ public class MainActivity extends Activity {
         mainContainer.setAdapter(mAdapter);
     }
 
-
     class ActivitysAdapter extends RecyclerView.Adapter<ItemHolder> {
 
         Class<? extends Activity>[] mActivities = new Class[]{
-                CircleProgressActivity.class,
-                ScaleViewActivity.class,
-                PolygonActivity.class,
-                BazierTestActivity.class
+                GenerateBazierIActivity.class,
+                GenerateBazierIIActivity.class,
+                BazierCircleActivity.class,
+                BazierBubbleActivity.class
         };
 
         String[] mDemoTips = new String[]{
-                "圆形进度条",
-                "刻度尺",
-                "圆角多边形",
-                "贝塞尔相关"
+                "迭代法-贝塞尔曲线",
+                "Casteljau算法-贝塞尔曲线",
+                "贝塞尔曲线拟圆",
+                "贝塞尔拖拽气泡"
         };
 
         @Override
@@ -75,7 +73,7 @@ public class MainActivity extends Activity {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(MainActivity.this, activityClass);
+                    Intent intent = new Intent(BazierTestActivity.this, activityClass);
                     startActivity(intent);
                 }
             });

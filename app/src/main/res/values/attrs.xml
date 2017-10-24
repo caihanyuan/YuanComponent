@@ -29,4 +29,11 @@
         <attr name="scale_view_end_over_range" format="dimension" />
         <attr name="scale_view_extend" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="YUAN_BubbleDragView">
+        <attr name="radius" format="dimension" />
+        <attr name="max_distance" format="dimension" />
+        <attr name="bubble_color" format="color" />
+        <attr name="duration" format="integer" />
+    </declare-styleable>
 </resources>

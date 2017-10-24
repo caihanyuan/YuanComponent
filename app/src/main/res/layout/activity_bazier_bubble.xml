@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.keepmoving.to.yuancomponent.activity.bazier.BazierBubbleActivity">
+
+    <com.keepmoving.to.yuancomponent.widget.bezier.BubbleDragView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:bubble_color="#ff1010"
+        app:duration="100"
+        app:max_distance="180dp"
+        app:radius="15dp" />
+</FrameLayout>

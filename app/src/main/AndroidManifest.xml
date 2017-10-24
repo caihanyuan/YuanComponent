@@ -18,7 +18,12 @@
         </activity>
         <activity android:name=".activity.CircleProgressActivity" />
         <activity android:name=".activity.ScaleViewActivity" />
-        <activity android:name=".activity.PolygonActivity"></activity>
+        <activity android:name=".activity.PolygonActivity" />
+        <activity android:name=".activity.bazier.BazierTestActivity" />
+        <activity android:name=".activity.bazier.GenerateBazierIActivity" />
+        <activity android:name=".activity.bazier.GenerateBazierIIActivity" />
+        <activity android:name=".activity.bazier.BazierCircleActivity" />
+        <activity android:name=".activity.bazier.BazierBubbleActivity"></activity>
     </application>
 
 </manifest>
