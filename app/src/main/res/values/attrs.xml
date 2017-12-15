@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="Yuan_CircleProgressView">
-        <attr name="set_color" format="color" />
+        <attr name="progress_color" format="color" />
         <attr name="default_color" format="color" />
         <attr name="default_ring_width" format="dimension" />
         <attr name="progress_ring_width" format="dimension" />
@@ -10,6 +10,7 @@
         <attr name="start_angle" format="integer" />
         <attr name="end_angle" format="integer" />
         <attr name="paint_cap" format="integer" />
+        <attr name="progress_colors" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="YUAN_LinearScaleView">

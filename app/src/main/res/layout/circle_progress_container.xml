@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="225dp"
-    android:layout_height="225dp">
+    android:layout_width="231dp"
+    android:layout_height="231dp">
 
     <com.keepmoving.to.yuancomponent.widget.circleprogress.CircleProgressView
         android:id="@+id/progress_view"
-        android:layout_width="225dp"
-        android:layout_height="225dp"
+        android:layout_width="231dp"
+        android:layout_height="231dp"
         android:layout_centerInParent="true"
         app:anim_duration="1500"
         app:default_color="@color/default_color"
-        app:default_ring_width="4dp"
+        app:default_ring_width="1dp"
         app:end_angle="410"
-        app:progress_ring_width="12dp"
+        app:progress_colors="@array/circle_colors"
+        app:progress_ring_width="5dp"
         app:show_anim="true"
         app:start_angle="130" />
 
@@ -22,18 +23,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:fontFamily="sans-serif"
+        android:includeFontPadding="false"
         android:text="0.00"
-        android:textColor="#FFF44B10"
-        android:textSize="@dimen/textsize_40sp" />
+        android:textColor="#333333"
+        android:textSize="@dimen/textsize_50sp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/current_progress_text"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="6.3dp"
+        android:includeFontPadding="false"
         android:text="@string/circle_progress_title_tip"
-        android:textSize="@dimen/textsize_13sp" />
+        android:textColor="#999999"
+        android:textSize="@dimen/textsize_12sp" />
 
 
     <LinearLayout
@@ -41,25 +46,28 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/circle_progress_total_title"
-            android:textSize="@dimen/textsize_13sp" />
+        android:layout_marginBottom="18dp"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/total_progress_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginTop="2dp"
-            android:text="0.00"
-            android:textColor="#FF434343"
-            android:textSize="@dimen/textsize_18sp" />
+            android:includeFontPadding="false"
+            android:text="@string/circle_progress_total_title"
+            android:textColor="#666666"
+            android:textSize="@dimen/textsize_12sp" />
+
+        <Button
+            style="@style/BlueBorderButton"
+            android:layout_width="40dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="4dp"
+            android:includeFontPadding="false"
+            android:text="@string/circle_progress_upgrade_money"
+            android:textSize="@dimen/textsize_12sp"
+            android:visibility="visible" />
 
     </LinearLayout>
 </RelativeLayout>

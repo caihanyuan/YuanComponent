@@ -46,6 +46,8 @@ public class CircleProgressView extends View {
     private int mEndAngle; //结束角度
     private int mAngleDistance; //角度差
     private Paint.Cap mCap; //画笔类型
+    private int[] mProgressColors; //渐变进度条颜色
+    private float[] mColorsPosition; //渐变进度条颜色位置
 
     private double mTmpProgress = 0;
     protected double mProgress;
@@ -104,7 +106,7 @@ public class CircleProgressView extends View {
 
     private void initView(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Yuan_CircleProgressView);
-        mProgressColor = typedArray.getColor(R.styleable.Yuan_CircleProgressView_set_color, Color.BLUE);
+        mProgressColor = typedArray.getColor(R.styleable.Yuan_CircleProgressView_progress_color, Color.BLUE);
         mDefaultColor = typedArray.getColor(R.styleable.Yuan_CircleProgressView_default_color, Color.GRAY);
         mDefaultRingWidth = typedArray.getDimensionPixelSize(R.styleable.Yuan_CircleProgressView_default_ring_width, 25);
         mProgressRingWidht = typedArray.getDimensionPixelSize(R.styleable.Yuan_CircleProgressView_progress_ring_width, mDefaultRingWidth);
@@ -112,7 +114,23 @@ public class CircleProgressView extends View {
         mDuration = typedArray.getInt(R.styleable.Yuan_CircleProgressView_anim_duration, 1000);
         mStartAngle = typedArray.getInt(R.styleable.Yuan_CircleProgressView_start_angle, 90);
         mEndAngle = typedArray.getInt(R.styleable.Yuan_CircleProgressView_end_angle, 90 + 360);
-        mEndAngle = typedArray.getInt(R.styleable.Yuan_CircleProgressView_end_angle, 90 + 360);
+        //获取渐变进度条颜色值，和位置
+        int progressColorsId = typedArray.getResourceId(R.styleable.Yuan_CircleProgressView_progress_colors, -1);
+        if (progressColorsId != -1) {
+            TypedArray colors = getResources().obtainTypedArray(progressColorsId);
+            int colorSize = colors.length();
+            mProgressColors = new int[colorSize];
+            mColorsPosition = new float[colorSize];
+            float gap = 1.0f / colorSize;
+            for (int i = 0; i < colorSize; i++) {
+                mProgressColors[i] = colors.getColor(i, Color.BLUE);
+                if (i == colorSize - 1) {
+                    mColorsPosition[i] = 1;
+                } else {
+                    mColorsPosition[i] = i * gap;
+                }
+            }
+        }
 
         int cap = typedArray.getInt(R.styleable.Yuan_CircleProgressView_paint_cap, 1);
         mCap = cap == PAINT_CAP_ROUND ? Paint.Cap.ROUND : Paint.Cap.SQUARE;
@@ -257,13 +275,11 @@ public class CircleProgressView extends View {
         if (mShader != null) {
             paint.setShader(mShader);
             return true;
-        } else {
-            int startColor = getResources().getColor(R.color.start_color);
-            int endColor = getResources().getColor(R.color.end_color);
+        } else if (mProgressColors != null) {
             int center = (int) (mCircleArea.right - mCircleArea.left) / 2;
 
             mMatrix.setRotate(mStartAngle - 10, center, center);
-            SweepGradient sweepGradient = new SweepGradient(center, center, startColor, endColor);
+            SweepGradient sweepGradient = new SweepGradient(center, center, mProgressColors, mColorsPosition);
             sweepGradient.setLocalMatrix(mMatrix);
 
             paint.setShader(sweepGradient);

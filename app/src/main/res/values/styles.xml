@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- 蓝色边框button -->
+    <style name="BlueBorderButton" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@drawable/blue_border_button_selector</item>
+        <item name="android:textColor">@color/blue_clickable_text_selector</item>
+    </style>
+
 </resources>

@@ -17,8 +17,8 @@ public class CircleProgressActivity extends Activity {
         setContentView(R.layout.circle_progress_activity);
 
         mContainer = (CircleProgressContainer) findViewById(R.id.progress_container);
-        mContainer.setMaxProgress(30000);
-        mContainer.setCurrentProgress(30000);
+        mContainer.setMaxProgress(300000);
+        mContainer.setCurrentProgress(220000);
     }
 
 }

@@ -69,7 +69,29 @@ public class StringUtils {
      * @return
      */
     public static String splitMoney(double moneyCount) {
-        String parttern = moneyCount < 1 ? "0.00" : "#,###.00";
+        return splitMoney(moneyCount, 2);
+    }
+
+    /**
+     * 按三位加一个逗号. 如￥50,000.00...
+     *
+     * @param moneyCount 数值
+     * @param accuracy   精度 大于等于0
+     * @return
+     */
+    public static String splitMoney(double moneyCount, int accuracy) {
+        assert accuracy >= 0;
+
+        String preFix = accuracy > 0 ? (moneyCount < 1 ? "0." : "#,###.")
+                : (moneyCount < 1 ? "0" : "#,###");
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(preFix);
+        while (accuracy > 0) {
+            stringBuffer.append("0");
+            accuracy--;
+        }
+        String parttern = stringBuffer.toString();
         DecimalFormat decimalFormat = new DecimalFormat(parttern);
         return decimalFormat.format(moneyCount);
     }

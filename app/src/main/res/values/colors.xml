@@ -8,4 +8,21 @@
     <color name="start_color">#FFFF495E</color>
     <color name="end_color">#FFFFA127</color>
     <color name="default_color">#FFE1E1E1</color>
+
+    <color name="colorWhite">#FFFFFFFF</color>
+    <color name="blue_border_color">#FF5085FB</color>
+    <color name="disable_blue_border_color">#995085FB</color>
+    <color name="disable_operator_text_color">#995085FB</color>
+    <color name="operator_text_color">#FF5085FB</color>
+
+    <!-- circle progress -->
+    <color name="circle_defalut_color">#eeede9</color>
+    <color name="circle_progress_color1">#f26767</color>
+    <color name="circle_progress_color2">#a077f6</color>
+    <color name="circle_progress_color3">#3d77f8</color>
+    <array name="circle_colors">
+        <item>@color/circle_progress_color1</item>
+        <item>@color/circle_progress_color2</item>
+        <item>@color/circle_progress_color3</item>
+    </array>
 </resources>

@@ -87,7 +87,7 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
      * 设置可用数值提示文本
      */
     protected void setCurrentProgressText(double progress) {
-        String tip = StringUtils.splitMoney(progress);
+        String tip = StringUtils.splitMoney(progress, 0);
         mCurrentProgressText.setText(tip);
     }
 
@@ -95,7 +95,8 @@ public class CircleProgressContainer extends FrameLayout implements ValueAnimato
      * 设置最大数值提示文本
      */
     protected void setMaxProgressText(double maxProgress) {
-        String tip = StringUtils.splitMoney(maxProgress);
+        String tip = getContext().getString(R.string.circle_progress_total_title);
+        tip = String.format(tip, StringUtils.splitMoney(maxProgress, 0));
         mMaxProgressText.setText(tip);
     }
 }
