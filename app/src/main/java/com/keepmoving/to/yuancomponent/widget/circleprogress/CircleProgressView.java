@@ -41,6 +41,7 @@ public class CircleProgressView extends View {
     private int mDefaultRingWidth; //默认圆环宽度
     private int mProgressRingWidht; //进度条宽度
     private boolean mShowAnim; //是否显示进度动画
+    private boolean mReverse; //动画反向
     private int mDuration; //动画时长
     private int mStartAngle; //开始角度
     private int mEndAngle; //结束角度
@@ -111,6 +112,7 @@ public class CircleProgressView extends View {
         mDefaultRingWidth = typedArray.getDimensionPixelSize(R.styleable.Yuan_CircleProgressView_default_ring_width, 25);
         mProgressRingWidht = typedArray.getDimensionPixelSize(R.styleable.Yuan_CircleProgressView_progress_ring_width, mDefaultRingWidth);
         mShowAnim = typedArray.getBoolean(R.styleable.Yuan_CircleProgressView_show_anim, false);
+        mReverse = typedArray.getBoolean(R.styleable.Yuan_CircleProgressView_reverse, false);
         mDuration = typedArray.getInt(R.styleable.Yuan_CircleProgressView_anim_duration, 1000);
         mStartAngle = typedArray.getInt(R.styleable.Yuan_CircleProgressView_start_angle, 90);
         mEndAngle = typedArray.getInt(R.styleable.Yuan_CircleProgressView_end_angle, 90 + 360);
@@ -309,6 +311,24 @@ public class CircleProgressView extends View {
     }
 
     /**
+     * 动画是否反向
+     *
+     * @return
+     */
+    public boolean isReverse() {
+        return mReverse;
+    }
+
+    /**
+     * 设置动画是否反向
+     *
+     * @param reverse
+     */
+    public void setReverse(boolean reverse) {
+        mReverse = reverse;
+    }
+
+    /**
      * 设置当前可用数值
      *
      * @param progress
@@ -367,7 +387,11 @@ public class CircleProgressView extends View {
         mAnimator.addListener(mAnimatorLifeListener);
         mAnimator.setInterpolator(mInterpolator);
         mAnimator.setDuration(mDuration);
-        mAnimator.start();
+        if (mReverse) {
+            mAnimator.reverse();
+        } else {
+            mAnimator.start();
+        }
     }
 
     /**

@@ -6,6 +6,7 @@
         <attr name="default_ring_width" format="dimension" />
         <attr name="progress_ring_width" format="dimension" />
         <attr name="show_anim" format="boolean" />
+        <attr name="reverse" format="boolean" />
         <attr name="anim_duration" format="integer" />
         <attr name="start_angle" format="integer" />
         <attr name="end_angle" format="integer" />
