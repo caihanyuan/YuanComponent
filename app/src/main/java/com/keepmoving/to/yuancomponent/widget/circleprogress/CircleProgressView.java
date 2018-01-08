@@ -236,7 +236,7 @@ public class CircleProgressView extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         int maxRingWidth = Math.max(mDefaultRingWidth, mProgressRingWidht);
-        int halfRingWidth = maxRingWidth / 2;
+        float halfRingWidth = maxRingWidth / 2.0f + 1; //往内一个像素，防止被裁剪
         mCircleArea = new RectF(halfRingWidth, halfRingWidth,
                 getWidth() - halfRingWidth, getHeight() - halfRingWidth);
     }
